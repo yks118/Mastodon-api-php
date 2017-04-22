@@ -636,7 +636,7 @@ class Mastodon_api {
 	 *
 	 * Uploading a media attachment
 	 *
-	 * @param   string      $file
+	 * @param   string      $file_path                  local path / http path
 	 *
 	 * @return  array       $response
 	 *          int         $response['id']             ID of the attachment
@@ -646,8 +646,25 @@ class Mastodon_api {
 	 *          string      $response['preview_url']    URL of the preview image
 	 *          string      $response['text_url']       Shorter URL for the image, for insertion into text (only present on local images)
 	 */
-	public function media ($file) {
-		$response = $this->_post('/api/v1/media',array('file'=>$file));
+	public function media ($file_path) {
+		$url = $this->mastodon_url.'/api/v1/media';
+		$parameters = $data = array();
+		$parameters[CURLOPT_HTTPHEADER] = array('Content-Type'=>'multipart/form-data');
+		$parameters[CURLOPT_POST] = true;
+
+		// set access_token
+		if (isset($this->token['access_token'])) {
+			$parameters[CURLOPT_POSTFIELDS]['access_token'] = $this->token['access_token'];
+		}
+
+		if (is_file($file_path)) {
+			$mime_type = mime_content_type($file_path);
+
+			$cf = curl_file_create($file_path,$mime_type,'file');
+			$parameters[CURLOPT_POSTFIELDS]['file'] = $cf;
+		}
+
+		$response = $this->get_content_curl($url,$parameters);
 		return $response;
 	}
 
