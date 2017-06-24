@@ -46,7 +46,7 @@ class Mastodon_api {
 		}
 
 		if (count($data)) {
-			$parameters[CURLOPT_POSTFIELDS] = http_build_query($data);
+			$parameters[CURLOPT_POSTFIELDS] = preg_replace('/([(%5B)]{1})[0-9]+([(%5D)]{1})/','$1$2',http_build_query($data));
 		}
 
 		$url = $this->mastodon_url.$url;
@@ -73,7 +73,7 @@ class Mastodon_api {
 
 		$url = $this->mastodon_url.$url;
 		if (count($data)) {
-			$url .= '?'.http_build_query($data);
+			$url .= '?'.preg_replace('/([(%5B)]{1})[0-9]+([(%5D)]{1})/','$1$2',http_build_query($data));
 		}
 
 		$response = $this->get_content_curl($url,$parameters);
