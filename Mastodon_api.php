@@ -326,6 +326,63 @@ class Mastodon_api {
 	}
 
 	/**
+	 * login
+	 *
+	 * @param   string      $code             Authorization code
+	 * @param   string      $redirect_uri
+	 *
+	 * @return  array       $response
+	 *          string      $response['access_token']
+	 *          string      $response['token_type']         bearer
+	 *          string      $response['scope']              read
+	 *          int         $response['created_at']         time
+	 */
+	public function loginAuthorization ($code, $redirect_uri = '') {
+		$parameters = array();
+		$parameters['client_id'] = $this->client_id;
+		$parameters['client_secret'] = $this->client_secret;
+		if (empty($redirect_uri)) {
+			$parameters['redirect_uri'] = 'urn:ietf:wg:oauth:2.0:oob';
+		} else {
+			$parameters['redirect_uri'] = $redirect_uri;
+		}
+		$parameters['grant_type'] = 'authorization_code';
+		$parameters['code'] = $code;
+		$response = $this->_post('/oauth/token',$parameters);
+		if (isset($response['html']['access_token'])) {
+			$this->token['access_token'] = $response['html']['access_token'];
+			$this->token['token_type'] = $response['html']['token_type'];
+		}
+		return $response;
+	}
+	
+	/**
+	 * getAuthorizationUrl
+	 *
+	 * @param   string      $redirect_uri
+	 *
+	 * @return  string       $response Authorization code
+	 */
+	public function getAuthorizationUrl($redirect_uri = '')
+	{
+		if (empty($redirect_uri))
+			$redirect_uri = 'urn:ietf:wg:oauth:2.0:oob';
+		if (count($this->scopes) == 0) {
+			$scopes = array('read','write','follow');
+		} else {
+			$scopes = $this->scopes;
+		}
+		$scope_uri = "";
+		foreach($scopes as $scope)
+			$scope_uri .= $scope. " ";
+		return $this->mastodon_url.'/oauth/authorize?'.
+		       "client_id=".$this->client_id."&redirect_uri=" . $redirect_uri.
+		       "&response_type=code&scope=".trim($scope_uri);
+	}
+
+
+
+	/**
 	 * accounts
 	 *
 	 * @see     https://your-domain/web/accounts/:id
