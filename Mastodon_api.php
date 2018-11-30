@@ -46,7 +46,7 @@ class Mastodon_api {
 		}
 
 		if (count($data)) {
-			$parameters[CURLOPT_POSTFIELDS] = preg_replace('/([(%5B)]{1})[0-9]+([(%5D)]{1})/','$1$2',http_build_query($data));
+			$parameters[CURLOPT_POSTFIELDS] = preg_replace('/((%5B){1})[0-9]+((%5D){1})/','$1$2',http_build_query($data));
 		}
 
 		$url = $this->mastodon_url.$url;
