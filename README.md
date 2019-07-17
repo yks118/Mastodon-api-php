@@ -15,5 +15,6 @@ $mastodon_api->set_token('access_token','token_type');<br />
 <br />
 $mastodon_api->timelines_home();
 
-## Test Mastodon
-https://ery.kr
+## This is Not Update.
+You Choice New Library.
+https://github.com/yks118/Mastodon-api-php-oauth
